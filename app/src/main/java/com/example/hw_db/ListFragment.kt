@@ -48,5 +48,27 @@ class ListFragment:Fragment() {
                 .addToBackStack(fragment.javaClass.name)
                 .commit()
         }
+
+        val itemTouchHelper = ItemTouchHelper(object:ItemTouchHelper.Callback(){
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                return makeMovementFlags(0,ItemTouchHelper.END)
+            }
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                if(direction == ItemTouchHelper.END){
+                    viewModel.remove(adapter.items[viewHolder.adapterPosition])
+                }
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(listView)
     }
 }
