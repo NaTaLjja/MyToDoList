@@ -21,4 +21,32 @@ class ListFragment:Fragment() {
     ): View? {
         return inflater.inflate(R.layout.list_fragment, container, false)
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(requireActivity()).get(TaskViewModel::class.java)
+        val listView: RecyclerView = view.findViewById(R.id.list)
+        val fab: FloatingActionButton = view.findViewById(R.id.fab)
+        val adapter = TaskAdapter()
+
+        listView.adapter = adapter
+        listView.layoutManager = LinearLayoutManager(requireContext())
+
+        viewModel.listState.observe(viewLifecycleOwner) { uiState ->
+            when (uiState) {
+                is TaskViewModel.ListState.EmptyList -> Unit
+                is TaskViewModel.ListState.UpdateList -> {
+                    adapter.updateItems(uiState.list)
+                }
+            }
+
+        }
+        fab.setOnClickListener {
+            val fragment = AddTaskFragment()
+            parentFragmentManager.beginTransaction()
+                .add(R.id.container, fragment)
+                .addToBackStack(fragment.javaClass.name)
+                .commit()
+        }
+    }
 }
